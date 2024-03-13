@@ -38,10 +38,9 @@ namespace Okta.AspNetCore
             oidcOptions.ResponseType = OpenIdConnectResponseType.Code;
             oidcOptions.GetClaimsFromUserInfoEndpoint = oktaMvcOptions.GetClaimsFromUserInfoEndpoint;
 #if NET8_0_OR_GREATER
-            oidcOptions.TokenHandler = new StrictTokenHandler();
-#else
-            oidcOptions.SecurityTokenValidator = new StrictSecurityTokenValidator();
+            oidcOptions.UseSecurityTokenValidator = true;
 #endif
+            oidcOptions.SecurityTokenValidator = new StrictSecurityTokenValidator();
             oidcOptions.SaveTokens = true;
             oidcOptions.UseTokenLifetime = false;
             oidcOptions.BackchannelHttpHandler = new OktaHttpMessageHandler(
@@ -97,14 +96,10 @@ namespace Okta.AspNetCore
                 ValidAudience = oktaWebApiOptions.Audience,
             };
 #if NET8_0_OR_GREATER
-            jwtBearerOptions.TokenHandlers.Clear();
-            jwtBearerOptions.TokenHandlers.Add(new StrictTokenHandler());
-
-#else
+            jwtBearerOptions.UseSecurityTokenValidators = true;
+#endif
             jwtBearerOptions.SecurityTokenValidators.Clear();
             jwtBearerOptions.SecurityTokenValidators.Add(new StrictSecurityTokenValidator());
-#endif
-
             jwtBearerOptions.Audience = oktaWebApiOptions.Audience;
             jwtBearerOptions.Authority = issuer;
             jwtBearerOptions.TokenValidationParameters = tokenValidationParameters;
